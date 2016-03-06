@@ -110,7 +110,7 @@ function start() { // засовываем в отдельную функцию 
 
     // вот мы грузим цветные карты
     var MyfeatureLayer = L.mapbox.featureLayer().addTo(map); //.addTo(map);
-    L.mapbox.featureLayer().loadURL('../lardzz/data/countries.geoJson').on('ready', function(e) {
+    L.mapbox.featureLayer().loadURL('../lardzz/data/countries.geojson').on('ready', function(e) {
       source = e.target.getGeoJSON();
       reloadMap("jan");
     });
