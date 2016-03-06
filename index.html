@@ -3,6 +3,8 @@
 <meta charset=utf-8 />
 <title>A simple map</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 <script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' />
 <style>
@@ -12,10 +14,78 @@
 </head>
 <body>
 <div id='map'></div>
+<div id="menu_ui"></div>
+
+
 <script>
-L.mapbox.accessToken = 'pk.eyJ1IjoibGFyZHp6IiwiYSI6ImNpaGM3eGxtdDAwMDN2M2phd3c1emlreGQifQ.Ih7ZCLa7CR291uw0W-zTmA';
-var map = L.mapbox.map('map', 'mapbox.streets')
-    .setView([40, -74.50], 12);
+
+
+    var month = "jan";
+    var prices;
+
+// Подключаем данные
+    $.getJSON("europe_prices_true.json", function(result) {
+      prices = result;
+      start();
+    });
+
+function start() { // засовываем в отдельную функцию тк надо дождаться чтобы завершилась загрузка json
+    // Грузим карту
+    L.mapbox.accessToken = 'pk.eyJ1IjoibGFyZHp6IiwiYSI6ImNpaGM3eGxtdDAwMDN2M2phd3c1emlreGQifQ.Ih7ZCLa7CR291uw0W-zTmA';
+
+    var map = L.mapbox.map('map')
+    .setView([55.744537,37.625224], 5);
+
+    L.mapbox.styleLayer('mapbox://styles/lardzz/cihryj0in00bjbnm30ahifluo').addTo(map);
+
+    var source;
+    var color_price;
+
+    function getColor (x) { // x - идентификатор страны "AUS" типа
+      if (prices[x]) {
+      return prices[x][month] > 500 ? "#0000ff" :
+             prices[x][month] > 400 ? "#ccc" :
+             prices[x][month] > 300 ? "#ff0000" :
+             prices[x][month] > 200 ? "#555" :
+             prices[x][month] > 100 ? "#ff0000" :
+             "000";
+       } else return "#000";
+    }
+/*  функция которая перебирает и сравнивает массивы но не нужна
+    function check (src, prc) {
+      var x = [];
+      src.features.forEach(function (a) {
+        // if (prc[a.properties.iso_a3]) console.log(a.properties.iso_a3 + " jan price: " + prc[a.properties.iso_a3].jan);
+        if (prc[a.properties.iso_a3]) {
+          console.log("jan == " + prc[a.properties.iso_a3].jan);
+          x.push(prc[a.properties.iso_a3].jan);
+        }
+      });
+      console.log("x == " + x);
+      return x;
+    }
+*/
+
+    function stylefunc(current_country) {  // current_country это такой параметр который передается независимо от того что мы его не определили
+      return {
+          fillColor: getColor(current_country.properties.iso_a3),
+          weight: 1,
+          opacity: 0.2,
+          color: 'white',
+          dashArray: '2',
+          fillOpacity: 0.7
+      };
+    }
+
+    // вот мы грузим цветные карты
+    var featureLayer = L.mapbox.featureLayer();
+    var countriesData = featureLayer.loadURL('countries.geoJson').on('ready', function(e) {
+      source = e.target.getGeoJSON();
+      L.geoJson(source, {style:stylefunc}).addTo(map);
+    });
+
+}
+
 </script>
 </body>
 </html>
