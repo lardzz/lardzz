@@ -8,8 +8,25 @@
 <script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' />
 <style>
-  body { margin:0; padding:0; }
+  body { margin:0; padding:0; font-family: roboto;}
   #map { position:absolute; top:0; bottom:0; width:100%; }
+  #switch {
+    position: absolute;
+    left:50px;
+    bottom: 50px;
+    width:500px;
+    height:50px;
+    border-radius: 5px;
+    background-color: #fff;
+    overflow: hidden;
+  }
+  #switch .button {
+    width:50px;
+    height: 40px;
+    text-align: center;
+    padding: 15px 5px 0px 5px;
+    float: left;
+  }
 </style>
 </head>
 <body>
@@ -19,9 +36,11 @@
 
 <script>
 
-
     var month = "jan";
     var prices;
+    var source; // для нашего json файла
+    var color_price;
+
 
 // Подключаем данные
     $.getJSON("europe_prices_true.json", function(result) {
@@ -38,9 +57,6 @@ function start() { // засовываем в отдельную функцию 
 
     L.mapbox.styleLayer('mapbox://styles/lardzz/cihryj0in00bjbnm30ahifluo').addTo(map);
 
-    var source;
-    var color_price;
-
     function getColor (x) { // x - идентификатор страны "AUS" типа
       if (prices[x]) {
       return prices[x][month] > 500 ? "#0000ff" :
@@ -51,6 +67,7 @@ function start() { // засовываем в отдельную функцию 
              "000";
        } else return "#000";
     }
+
 /*  функция которая перебирает и сравнивает массивы но не нужна
     function check (src, prc) {
       var x = [];
@@ -77,15 +94,30 @@ function start() { // засовываем в отдельную функцию 
       };
     }
 
+    //очищаем объекты предыдущие
+    function reloadMap(mnth) {
+      month = mnth;
+      MyfeatureLayer.clearLayers();
+      L.geoJson(source, {style:stylefunc}).addTo(MyfeatureLayer);
+    }
+
     // вот мы грузим цветные карты
-    var featureLayer = L.mapbox.featureLayer();
-    var countriesData = featureLayer.loadURL('countries.geoJson').on('ready', function(e) {
+    var MyfeatureLayer = L.mapbox.featureLayer().addTo(map); //.addTo(map);
+    L.mapbox.featureLayer().loadURL('countries.geoJson').on('ready', function(e) {
       source = e.target.getGeoJSON();
-      L.geoJson(source, {style:stylefunc}).addTo(map);
+      reloadMap("jan");
     });
 
+    MyfeatureLayer.on('click', function(e) {
+      reloadMap("feb");
+    });
 }
-
 </script>
+
+<div id="switch">
+  <div class="button" onclick="alrt()">JAN</div>
+  <div class="button" onclick="reloadMap('feb')">FEB</div>
+</div>
+
 </body>
 </html>
