@@ -14,7 +14,7 @@
     position: absolute;
     left:50px;
     bottom: 50px;
-    width:500px;
+    width:480px;
     height:50px;
     border-radius: 5px;
     background-color: #fff;
@@ -26,6 +26,10 @@
     text-align: center;
     padding: 15px 5px 0px 5px;
     float: left;
+  }
+  .range {
+    width:450px;
+    margin: 15px;
   }
 </style>
 </head>
@@ -40,6 +44,7 @@
     var prices;
     var source; // для нашего json файла
     var color_price;
+    var monthList = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 
 // Подключаем данные
@@ -49,22 +54,24 @@
     });
 
 function start() { // засовываем в отдельную функцию тк надо дождаться чтобы завершилась загрузка json
-    // Грузим карту
+    // берем токен
     L.mapbox.accessToken = 'pk.eyJ1IjoibGFyZHp6IiwiYSI6ImNpaGM3eGxtdDAwMDN2M2phd3c1emlreGQifQ.Ih7ZCLa7CR291uw0W-zTmA';
 
-    var map = L.mapbox.map('map')
-    .setView([55.744537,37.625224], 5);
+    // включаем карту
+    var map = L.mapbox.map('map').setView([55.744537,37.625224], 5);
 
+    // добавляем стиль подложки
     L.mapbox.styleLayer('mapbox://styles/lardzz/cihryj0in00bjbnm30ahifluo').addTo(map);
 
+    // красим страны
     function getColor (x) { // x - идентификатор страны "AUS" типа
       if (prices[x]) {
       return prices[x][month] > 500 ? "#0000ff" :
-             prices[x][month] > 400 ? "#ccc" :
-             prices[x][month] > 300 ? "#ff0000" :
-             prices[x][month] > 200 ? "#555" :
-             prices[x][month] > 100 ? "#ff0000" :
-             "000";
+             prices[x][month] > 400 ? "#4400bb" :
+             prices[x][month] > 300 ? "#670098" :
+             prices[x][month] > 200 ? "#ba0045" :
+             prices[x][month] > 100 ? "#ea0015" :
+             "#0000ff";
        } else return "#000";
     }
 
@@ -97,7 +104,7 @@ function start() { // засовываем в отдельную функцию 
     //очищаем объекты предыдущие
     function reloadMap(mnth) {
       month = mnth;
-      MyfeatureLayer.clearLayers();
+      MyfeatureLayer.clearLayers(); // !!! очищаем, еее
       L.geoJson(source, {style:stylefunc}).addTo(MyfeatureLayer);
     }
 
@@ -111,12 +118,20 @@ function start() { // засовываем в отдельную функцию 
     MyfeatureLayer.on('click', function(e) {
       reloadMap("feb");
     });
+
+    var range = document.getElementById('range');
+    range.addEventListener("change", function() {
+      reloadMap(monthList[range.value]);
+    });
 }
 </script>
 
 <div id="switch">
-  <div class="button" onclick="alrt()">JAN</div>
+  <!--
+  <div class="button" onclick="reloadMap('jan')">JAN</div>
   <div class="button" onclick="reloadMap('feb')">FEB</div>
+  -->
+  <input id='range' class='range' type='range' min='0' max='11' step='1' />
 </div>
 
 </body>
