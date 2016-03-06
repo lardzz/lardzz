@@ -72,7 +72,7 @@ function start() { // засовываем в отдельную функцию 
              prices[x][month] > 200 ? "#ba0045" :
              prices[x][month] > 100 ? "#ea0015" :
              "#0000ff";
-       } else return "#000";
+       } else return "rgba(0,0,0,1)";
     }
 
 /*  функция которая перебирает и сравнивает массивы но не нужна
@@ -131,7 +131,7 @@ function start() { // засовываем в отдельную функцию 
   <div class="button" onclick="reloadMap('jan')">JAN</div>
   <div class="button" onclick="reloadMap('feb')">FEB</div>
   -->
-  <input id='range' class='range' type='range' min='0' max='11' step='1' />
+  <input id='range' class='range' value='0' type='range' min='0' max='11' step='1' />
 </div>
 
 </body>
